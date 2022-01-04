@@ -1,1 +1,33 @@
-// TODO
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+
+  .post {
+    margin-bottom: 2rem;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  h1 {
+    color: var(--heading);
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  p {
+    color: var(--body);
+    font-size: 1.25rem;
+    margin: 0.5rem 0 1.5rem 0;
+  }
+
+  time,
+  span {
+    color: var(--info);
+  }
+
+  span {
+    margin-left: 4rem;
+  }
+}

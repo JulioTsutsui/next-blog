@@ -1,1 +1,8 @@
-// TODO
+.banner {
+  position: relative;
+  height: 400px;
+
+  img {
+    object-fit: contain;
+  }
+}
