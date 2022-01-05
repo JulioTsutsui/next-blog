@@ -1,4 +1,6 @@
 import { GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
@@ -29,13 +31,45 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
+  const [newPosts, setNewPosts] = useState<Post[]>([]);
+  const [loadButtonEnable, setLoadButtonEnable] = useState(
+    postsPagination.next_page !== null
+  );
+  const router = useRouter();
+
+  if (router?.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
+
+  function loadMorePosts(): void {
+    fetch(postsPagination?.next_page)
+      .then(res => res.json())
+      .then((res: PostPagination) => {
+        const formatedPosts = res.results.map(post => {
+          return {
+            ...post,
+            first_publication_date: format(
+              new Date(post.first_publication_date),
+              'dd MMM yyyy',
+              {
+                locale: ptBR,
+              }
+            ),
+          };
+        });
+
+        setNewPosts([...newPosts, ...formatedPosts]);
+        setLoadButtonEnable(res.next_page !== null);
+      });
+  }
+
   return (
     <>
       <Header />
       <section className={styles.container}>
         {postsPagination.results.map(post => {
           return (
-            <article className={styles.post}>
+            <article key={post.uid} className={styles.post}>
               <Link href={`/post/${post.uid}`}>
                 <a>
                   <h1>{post.data.title}</h1>
@@ -44,7 +78,14 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               </Link>
               <div>
                 <time>
-                  <FiCalendar /> {post.first_publication_date}
+                  <FiCalendar />{' '}
+                  {format(
+                    new Date(post.first_publication_date),
+                    'dd MMM yyyy',
+                    {
+                      locale: ptBR,
+                    }
+                  )}
                 </time>
                 <span>
                   <FiUser /> {post.data.author}
@@ -53,6 +94,40 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </article>
           );
         })}
+
+        {newPosts.map(post => {
+          return (
+            <article key={post.uid} className={styles.post}>
+              <Link href={`/post/${post.uid}`}>
+                <a>
+                  <h1>{post.data.title}</h1>
+                  <p>{post.data.subtitle}</p>
+                </a>
+              </Link>
+              <div>
+                <time>
+                  <FiCalendar />{' '}
+                  {format(
+                    new Date(post.first_publication_date),
+                    'dd MMM yyyy',
+                    {
+                      locale: ptBR,
+                    }
+                  )}
+                </time>
+                <span>
+                  <FiUser /> {post.data.author}
+                </span>
+              </div>
+            </article>
+          );
+        })}
+
+        {loadButtonEnable && (
+          <button type="button" onClick={loadMorePosts}>
+            Carregar mais posts
+          </button>
+        )}
       </section>
     </>
   );
@@ -65,20 +140,14 @@ export const getStaticProps: GetStaticProps = async () => {
     Prismic.predicates.at('document.type', 'post'),
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
-      pageSize: 3,
+      pageSize: 2,
     }
   );
 
   const results = response.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.last_publication_date),
-        'dd MMM yyyy',
-        {
-          locale: ptBR,
-        }
-      ),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
@@ -90,7 +159,7 @@ export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
       postsPagination: {
-        next_page: null,
+        next_page: response.next_page,
         results,
       },
     },

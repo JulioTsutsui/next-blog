@@ -3,6 +3,46 @@
   height: 400px;
 
   img {
-    object-fit: contain;
+    object-fit: fill;
+  }
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+
+  h1 {
+    color: var(--heading);
+    margin: 4rem 0 1.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+
+  time,
+  span {
+    color: var(--info);
+  }
+}
+
+.content {
+  margin: 3rem 0;
+  h2 {
+    color: var(--heading);
+    margin: 2rem 0;
+    font-weight: 700;
+  }
+
+  p {
+    line-height: 1.5;
+    color: var(--body);
+    font-size: 1.125rem;
+    text-align: justify;
   }
 }

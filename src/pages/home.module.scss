@@ -30,4 +30,13 @@
   span {
     margin-left: 4rem;
   }
+
+  button {
+    background-color: transparent;
+    color: var(--highlight);
+    font-size: 1.125rem;
+    font-weight: 600;
+    border: 0;
+    cursor: pointer;
+  }
 }
