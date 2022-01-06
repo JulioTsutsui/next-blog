@@ -11,18 +11,20 @@ import Header from '../../components/Header';
 import styles from './post.module.scss';
 
 interface Post {
+  uid: string;
   first_publication_date: string | null;
   data: {
     title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
     author: string;
     content: {
-      heading: string;
       body: {
         text: string;
       }[];
+      heading: string;
     }[];
   };
 }
@@ -102,17 +104,19 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const response = await prismic.getByUID('post', String(slug), {});
 
   const post = {
-    first_publication_date: response.last_publication_date,
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
     data: {
       title: response.data.title,
       banner: {
         url: response.data.banner.url,
       },
       author: response.data.author,
+      subtitle: response.data.subtitle,
       content: response.data.content.map(cont => {
         return {
-          heading: cont.heading.text,
           body: cont.body,
+          heading: cont.heading,
         };
       }),
     },
